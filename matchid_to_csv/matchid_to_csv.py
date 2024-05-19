@@ -1,11 +1,7 @@
 import requests
 import time
-import sample_data
 
 def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
-    """
-    Takes in a list match_ids and an api_key, and converts the required data into CSV file format.
-    """
     for match in match_ids:
 
         #handles rate limits, when limit is hit, it keeps on trying, until the limit is gone
@@ -18,11 +14,7 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
                 continue
             match_info = match_info.json()
             break
-        
-        #saves gold diff, and list of champions in the following order
-        #team 1's (top jg mid bot sup) team 2's (top jg mid bot sup)
-        #team1 = 100, team2 = 200
-        #if team1 has more gold, then the gold value is positive, and the inverse of this implication holds
+
         temp = [0]
         for participant in match_info["info"]["participants"]:
             temp2 = []
@@ -42,7 +34,7 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
         else:
             temp.append(200)    
         print(temp)
-        append_to_csv(temp, "output.csv")
+        append_to_csv(temp, file_name)
 
 
 def append_to_csv(row: list, file_name: str)-> None:

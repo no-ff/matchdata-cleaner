@@ -20,8 +20,6 @@ What it does:
 
 #Example Usage
 #the following call was made to create all data of sample_oupput with sample_data as input
-"""
 import sample_data
 input = sample_data.input
-convert(input, "RGAPI-ea2182cf-cda1-41ad-8ac5-8b599474ae92", "output.csv")
-"""
+convert(input, "RGAPI-ea2182cf-cda1-41ad-8ac5-8b599474ae92", "sample_output.csv")
