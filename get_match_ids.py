@@ -47,6 +47,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
         print(f"iteration second time, {iteration_second - start_time}")
         puuids = matchType["metadata"]["participants"]
         for player in puuids:
+            print(player)
             #get last matches of players
             new_matches = player_to_match_ids(player, api_key, 5, 0)
             for match in new_matches:
