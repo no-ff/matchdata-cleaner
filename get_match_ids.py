@@ -50,7 +50,7 @@ def bfs_get_match_ids(amount: int, start: str, already: list[str], api_key: str)
             for match in new_matches:
                 if match not in already:
                     queue.append(match)
-                    already.append(match)
+                    already[match] = 1
                     ret_matches.append(match)
                     counter += 1
         queue.pop(0)
