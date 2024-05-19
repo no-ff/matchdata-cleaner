@@ -25,7 +25,7 @@ def matchId_to_match(match_id:str, api_key:str) -> dict:
     match = match.json()
     return match
 
-def bfs_get_match_ids(amount: int, start: str, already: list[str], api_key: str, file_name: str):
+def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key: str, file_name: str):
     
     #get recent x games of the start player
     #start: matchID
@@ -49,12 +49,12 @@ def bfs_get_match_ids(amount: int, start: str, already: list[str], api_key: str,
         for player in puuids:
             #get last matches of players
             new_matches = player_to_match_ids(player, api_key, 5, 0)
-
             for match in new_matches:
-                #if match not in already:
-                queue.append(match)
-                already.append(match)
-                ret_matches.append(match)
+                in_already = already.get(match, 0)
+                if in_already == 0:
+                    already[match] = 1
+                    queue.append(match)
+                    ret_matches.append(match)
 
         queue.pop(0)
         counter += 1
