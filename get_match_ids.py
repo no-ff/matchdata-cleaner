@@ -1,6 +1,6 @@
-
 import requests
 import time
+from matchid_to_csv import convert
 
 def player_to_match_ids(puuid:str, api_key:str, amount: int, start: int) -> list[str]:
     #get last x games of the player
@@ -25,7 +25,7 @@ def matchId_to_match(match_id:str, api_key:str) -> dict:
     match = match.json()
     return match
 
-def bfs_get_match_ids(amount: int, start, already: list[str]):
+def bfs_get_match_ids(amount: int, start: str, already: list[str], api_key: str, file_name: str):
     
     #get recent x games of the start player
     #start: matchID
@@ -36,25 +36,35 @@ def bfs_get_match_ids(amount: int, start, already: list[str]):
     counter = 0
     ret_matches = []
     queue = [start]
+    start_time = time.time()
     while (queue is not None) and counter < amount:
         #need to convert matchid to match datatype
         matchType = matchId_to_match(queue[0], api_key)
+        iteration_first = time.time()
+        print(f"iteration first time, {iteration_first - start_time}")
+        convert(matchType, api_key, file_name, queue[0])
+        iteration_second = time.time()
+        print(f"iteration second time, {iteration_second - start_time}")
         puuids = matchType["metadata"]["participants"]
-        print(puuids)
         for player in puuids:
             #get last matches of players
             new_matches = player_to_match_ids(player, api_key, 5, 0)
+
             for match in new_matches:
-                if match not in already:
-                    queue.append(match)
-                    already.append(match)
-                    ret_matches.append(match)
+                #if match not in already:
+                queue.append(match)
+                already.append(match)
+                ret_matches.append(match)
+
         queue.pop(0)
         counter += 1
-    return ret_matches
 
 
+
+
+"""
 if __name__ == "__main__":
-    api_key = "RGAPI-4ffbc243-e506-4653-9f9c-1fc10db5c39e"
-    start = "NA1_5000911837"
+    api_key = ""
+    start = ""
     print(bfs_get_match_ids(1, start, [start]))
+"""
