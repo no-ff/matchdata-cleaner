@@ -1,7 +1,7 @@
 #this file exists, so it is very easy to call the functions, with examples. 
 from matchid_to_csv import convert
 from get_match_ids import bfs_get_match_ids
-YOUR_API_KEY = "" #must enter to make any call
+YOUR_API_KEY = "RGAPI-ea2182cf-cda1-41ad-8ac5-8b599474ae92" #must enter to make any call
 
 
 AMOUNT = 1 #specify how many match ids you want to get

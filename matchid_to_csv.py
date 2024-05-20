@@ -33,14 +33,17 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
             temp.append(200)   
 
         temp.append(match)
+        temp.append(match_info["info"]["gameDuration"])
+
         append_to_csv(temp, file_name)
 
 
 def append_to_csv(row: list, file_name: str)-> None:
     insert_row = ""
-    for i in range(1, len(row)-2):
+    print(row)
+    for i in range(1, len(row)-3):
         insert_row += str(row[i][0][0]) + ","
-    insert_row += str(row[0]) + "," + str(row[-2])+ ","+ str(row[-1])
+    insert_row += str(row[0]) + "," + str(row[-3])+ ","+ str(row[-2]) + "," + str(row[-1])
 
     with open(file_name, 'a') as c:
         c.write(insert_row+"\n")
