@@ -4,7 +4,7 @@ from get_match_ids import bfs_get_match_ids
 YOUR_API_KEY = "" #must enter to make any call
 
 
-AMOUNT = 1000 #specify how many match ids you want to get
+AMOUNT = 1 #specify how many match ids you want to get
 START =  "NA1_4995853430" #A MatchId to start the search on
 ALREADY = { "NA1_4995853430":1} #lists of match_id we already have, prevents duplicates, and infinite loops
 match_ids = bfs_get_match_ids(AMOUNT, START, ALREADY, YOUR_API_KEY)

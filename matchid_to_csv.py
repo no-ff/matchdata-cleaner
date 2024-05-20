@@ -6,7 +6,6 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
         #handles rate limits, when limit is hit, it keeps on trying, until the limit is gone
         while True:
             match_info = requests.get("https://americas.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s" %(match, api_key))
-            print(match_info)
             if match_info.status_code == 429:
                 print("Rate Limit Exceeded, gonna sleep a bit")
                 time.sleep(20)
@@ -31,7 +30,8 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
         if match_info["info"]["participants"][0]["win"]:
             temp.append(100)
         else:
-            temp.append(200)    
+            temp.append(200)   
+
         temp.append(match)
         append_to_csv(temp, file_name)
 

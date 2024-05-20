@@ -1,11 +1,10 @@
 import requests
 import time
-from matchid_to_csv import convert
 
 def player_to_match_ids(puuid:str, api_key:str, amount: int, start: int) -> list[str]:
     #get last x games of the player
     # start: starting at x recent game going down
-    req = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%i&count=%i&api_key=%s" %(puuid, start, amount, api_key)
+    req = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?queue=420&start=%i&count=%i&api_key=%s" %(puuid, start, amount, api_key)
     matches = requests.get(req)
     print("MatchIDCalls" + str(matches))
     if matches.status_code == 429:
@@ -27,7 +26,7 @@ def matchId_to_match(match_id:str, api_key:str) -> dict:
     match = match.json()
     return match
 
-def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key: str, file_name: str):
+def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key: str):
     
     #get recent x games of the start player
     #start: matchID
@@ -42,9 +41,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
         #need to convert matchid to match datatype
         matchType = matchId_to_match(queue[0], api_key)
         puuids = matchType["metadata"]["participants"]
-        print(puuids)
         for player in puuids:
-            print(player)
             #get last matches of players
             new_matches = player_to_match_ids(player, api_key, 5, 0)
             for match in new_matches:
