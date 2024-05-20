@@ -1,23 +1,37 @@
 #this file exists, so it is very easy to call the functions, with examples. 
 from matchid_to_csv import convert
 from get_match_ids import bfs_get_match_ids
-YOUR_API_KEY = "RGAPI-efdc536a-6a0f-4b00-8e8d-853f3011d1d4"
+YOUR_API_KEY = "ENTER YOUR API KEY"
 #must enter to make any call
 
 
 
 def convert_txt_to_list(file_name):
-    with open("matchids.txt", "r") as this:
-        data = list(set(this.readlines()))
-
+    with open(file_name, "r") as this:
+        data = this.readlines()
     new = []
     for i in data:
-        new.append(i[:-2])
+        new.append(i[:-1])
     return new
 
 
-    
-    
+
+
+"""
+AMOUNT = 100000 #specify how many match ids you want to get
+START =  "NA1_4922217979" #A MatchId to start the search on
+ALREADY = { "NA1_4922217979":1} #lists of match_id we already have, prevents duplicates, and infinite loops
+match_ids = bfs_get_match_ids(AMOUNT, START, ALREADY, YOUR_API_KEY)
+"""
+
+
+CSV_FILE_NAME = "output1.csv" #enter the csv file you want to append to
+INPUT = convert_txt_to_list("input1.txt")
+convert(INPUT, YOUR_API_KEY, CSV_FILE_NAME)
+
+
+
+
 
 
 def split_list_and_write_to_files(input_list, file1='input1.txt', file2='input2.txt'):
@@ -41,17 +55,4 @@ def split_list_and_write_to_files(input_list, file1='input1.txt', file2='input2.
 with open("matchids.txt", "r") as this:
     data = list(set(this.readlines()))   
 
-split_list_and_write_to_files(data)
-
-"""
-AMOUNT = 100000 #specify how many match ids you want to get
-START =  "NA1_4922217979" #A MatchId to start the search on
-ALREADY = { "NA1_4922217979":1} #lists of match_id we already have, prevents duplicates, and infinite loops
-match_ids = bfs_get_match_ids(AMOUNT, START, ALREADY, YOUR_API_KEY)
-
-
-CSV_FILE_NAME = "sample_output.csv" #enter the csv file you want to append to
-INPUT = convert_txt_to_list("matchids.txt")
-print(INPUT)
-convert(INPUT, YOUR_API_KEY, CSV_FILE_NAME)
-"""
+#split_list_and_write_to_files(data)

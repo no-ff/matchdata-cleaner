@@ -33,7 +33,6 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
 
             match_info = match_info.json()
             break
-        
         if move_on:
             continue
 
