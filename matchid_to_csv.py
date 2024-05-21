@@ -51,17 +51,20 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
             temp.append(temp2)
 
         #appends the winning team to the end
-        if match_info["info"]["participants"][0]["win"]:
-            temp.append(100)
+        if len(match_info["info"]["participants"]) > 1:
+            if match_info["info"]["participants"][0]["win"]:
+                temp.append(100)
+            else:
+                temp.append(200)
         else:
-            temp.append(200)   
+            temp.append("error")
 
         temp.append(match)
         temp.append(match_info["info"]["gameDuration"])
 
         append_to_csv(temp, file_name)
         print(time.time() - startTime)
-        time.sleep(0.7)
+        time.sleep(0.65)
 
 
 def append_to_csv(row: list, file_name: str)-> None:
