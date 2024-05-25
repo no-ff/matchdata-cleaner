@@ -43,10 +43,11 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
         puuids = matchType["metadata"]["participants"]
         for player in puuids:
             #get last matches of players
+            #check the player's rank
             new_matches = player_to_match_ids(player, api_key, 50, 0)
             for match in new_matches:
                 in_already = already.get(match, 0)
-                if in_already == 0:
+                if in_already == 0 and match[]:
                     already[match] = 1
                     queue.append(match)
                     ret_matches.append(match)
@@ -56,10 +57,6 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
     f.close()
     return ret_matches
     
-
-
-
-
 
 """
 if __name__ == "__main__":
