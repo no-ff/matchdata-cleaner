@@ -44,11 +44,21 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
     while (queue is not None) and counter < amount:
         # Convert matchid to match datatype
         matchType = matchId_to_match(queue[0], api_key)
-        puuids = matchType["metadata"]["participants"] # Grab all 10 players to initially fill up the queue.
+        # Grab all 10 players to initially fill up the queue.
+        puuids = matchType["metadata"]["participants"]
         for player in puuids:
             # Get last matches of players.
-            # Idea: Check the player's specific rank. (Unfortunately not available in API)
-            new_matches = player_to_match_ids(player, api_key, 50, 0)
+            # Check the player's specific rank/tier (Challenger, Diamond...)
+            req = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/" + \
+                player + "?api_key=" + api_key
+            encryptedSummId = requests.get(req).json()["id"]
+            req = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/" + \
+                encryptedSummId + "?api_key=" + api_key
+            rank = requests.get(req).json()["tier"]
+            if not (rank == "CHALLENGER" or rank == "GRANDMASTER" or rank == "MASTER" or rank == "DIAMOND"):
+                continue  # Only consider high ranking players.
+            # Note that this may grab ranks below Diamond.
+            new_matches = player_to_match_ids(player, api_key, 25, 0)
             for match in new_matches:
                 in_already = already.get(match, 0)
                 if in_already == 0:
