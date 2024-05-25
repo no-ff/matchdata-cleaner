@@ -36,7 +36,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
     # Go through each of them, save the match_ids. (Checks whether it already is in 'already')
     # Then add the players of each game into the queue.
     # Repeat until target amount has been met.
-    f = open("matchids.txt", "a")
+    f = open("potential/matchids.txt", "a")
 
     counter = 0
     ret_matches = []
@@ -51,14 +51,23 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
             # Check the player's specific rank/tier (Challenger, Diamond...)
             req = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/" + \
                 player + "?api_key=" + api_key
-            encryptedSummId = requests.get(req).json()["id"]
+            r = requests.get(req)
+            if r.status_code == 429:
+                print("Rate Limit Exceeded, gonna sleep a bit")
+                time.sleep(120)
+                r = requests.get(req)
+            encryptedSummId = r.json()["id"]
             req = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/" + \
                 encryptedSummId + "?api_key=" + api_key
-            rank = requests.get(req).json()["tier"]
+            r = requests.get(req)
+            if r.status_code == 429:
+                print("Rate Limit Exceeded, gonna sleep a bit")
+                time.sleep(120)
+                r = requests.get(req)
+            rank = r.json()[0]["tier"]
             if not (rank == "CHALLENGER" or rank == "GRANDMASTER" or rank == "MASTER" or rank == "DIAMOND"):
                 continue  # Only consider high ranking players.
-            # Note that this may grab ranks below Diamond.
-            new_matches = player_to_match_ids(player, api_key, 25, 0)
+            new_matches = player_to_match_ids(player, api_key, 25, 0) # Note that this may grab ranks below Diamond.
             for match in new_matches:
                 in_already = already.get(match, 0)
                 if in_already == 0:
