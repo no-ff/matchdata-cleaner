@@ -5,7 +5,7 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
     startTime = time.time()
     for match in match_ids:
 
-        #handles exceptions
+        # Handle exceptions.
         move_on = False
         while True:
             match_info = requests.get("https://americas.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s" %(match, api_key))
@@ -50,7 +50,7 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
                 temp[0] -= participant["goldEarned"]
             temp.append(temp2)
 
-        #appends the winning team to the end
+        # Append the winning team to the end.
         if len(match_info["info"]["participants"]) > 1:
             if match_info["info"]["participants"][0]["win"]:
                 temp.append(100)
