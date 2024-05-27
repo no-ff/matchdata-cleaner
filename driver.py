@@ -1,7 +1,7 @@
 # This file exists, so it is very easy to call the functions, with examples.
 from matchid_to_csv import convert
 from get_match_ids import bfs_get_match_ids
-YOUR_API_KEY = "RGAPI-f0a6ad79-6bb0-4978-a1c2-ae285fc49302"
+YOUR_API_KEY = "RGAPI-5b23e179-3710-4cc9-a5b8-dc9325b9e49c"
 # Must enter to make any call.
 
 
@@ -14,39 +14,63 @@ def convert_txt_to_list(file_name):
     return new
 
 
-AMOUNT = 100000  # Specify how many match ids you want to get.
+AMOUNT = 1000000  # Specify how many match ids you want to get.
 # A MatchId to start the search on. Currently a Challenger match.
-START = "NA1_5005110386"
-# Lists of match_id we already have, prevents duplicates, and infinite loops.
-ALREADY = {"NA1_5005110386": 1}
+START = "NA1_4999862437"# Lists of match_id we already have, prevents duplicates, and infinite loops.
+ALREADY = {"NA1_4999862437": 1}
 match_ids = bfs_get_match_ids(AMOUNT, START, ALREADY, YOUR_API_KEY)
 
 # Enter the csv file you want to append to.
-CSV_FILE_NAME = "potential/output1.csv"
-INPUT = convert_txt_to_list("potential/input1.txt")
-convert(INPUT, YOUR_API_KEY, CSV_FILE_NAME)
+#CSV_FILE_NAME = "potential/output1.csv"
+#INPUT = convert_txt_to_list("potential/input1.txt")
+#convert(INPUT, YOUR_API_KEY, CSV_FILE_NAME)
 
 
-def split_list_and_write_to_files(input_list, file1='potential/input1.txt', file2='potential/input2.txt'):
-    # Calculate the midpoint of the list.
-    mid_index = len(input_list) // 2
+def split_file_and_write_to_files(input_file, file1, file2):
+    try:
+        # Read the input file
+        with open(input_file, 'r') as file:
+            data = file.readlines()
 
-    # Split the list into two halves.
-    first_half = input_list[:mid_index]
-    second_half = input_list[mid_index:]
+        # Calculate the midpoint of the list.
+        mid_index = len(data) // 2
 
-    # Write the first half to the first file.
-    with open(file1, 'w') as f1:
-        for item in first_half:
-            f1.write(f"{item}")
+        # Split the list into two halves.
+        first_half = data[:mid_index]
+        second_half = data[mid_index:]
 
-    # Write the second half to the second file.
-    with open(file2, 'w') as f2:
-        for item in second_half:
-            f2.write(f"{item}")
+        # Write the first half to the first file.
+        with open(file1, 'w') as f1:
+            f1.writelines(first_half)
+
+        # Write the second half to the second file.
+        with open(file2, 'w') as f2:
+            f2.writelines(second_half)
+        
+        print(f"File split successfully. First half written to {file1}, second half written to {file2}.")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
-with open("potential/matchids.txt", "r") as this:
-    data = list(set(this.readlines()))
 
-split_list_and_write_to_files(data)
+def remove_duplicates(input_file_path, output_file_path):
+    try:
+        # Read the input file
+        with open(input_file_path, 'r') as file:
+            data = file.readlines()
+
+        # Remove duplicates by converting the list to a set and back to a list
+        unique_data = list(set(data))
+
+        # Sort the data if you want to maintain a specific order (optional)
+        unique_data.sort()
+
+        # Write the unique data to the output file
+        with open(output_file_path, 'w') as file:
+            file.writelines(unique_data)
+        
+        print(f"Duplicates removed. Unique data written to {output_file_path}.")
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")

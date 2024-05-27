@@ -36,7 +36,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
     # Go through each of them, save the match_ids. (Checks whether it already is in 'already')
     # Then add the players of each game into the queue.
     # Repeat until target amount has been met.
-    f = open("potential/matchids.txt", "a")
+    f = open("output.txt", "a")
 
     counter = 0
     ret_matches = []
@@ -46,17 +46,35 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
         matchType = matchId_to_match(queue[0], api_key)
         # Grab all 10 players to initially fill up the queue.
         puuids = matchType["metadata"]["participants"]
+
+
+
         for player in puuids:
             # Get last matches of players.
             # Check the player's specific rank/tier (Challenger, Diamond...)
             req = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/" + \
                 player + "?api_key=" + api_key
             r = requests.get(req)
+
             if r.status_code == 429:
                 print("Rate Limit Exceeded, gonna sleep a bit")
                 time.sleep(120)
                 r = requests.get(req)
             encryptedSummId = r.json()["id"]
+
+            if r.status_code == 400 or \
+                    r.status_code == 403 or \
+                    r.status_code == 401 or \
+                    r.status_code == 404 or \
+                    r.status_code == 405 or \
+                    r.status_code == 415 or \
+                    r.status_code == 500 or \
+                    r.status_code == 502 or \
+                    r.status_code == 503 or \
+                    r.status_code == 504:
+                print(f"The following error code has been invoked:{r.status_code}")
+                continue
+
             req = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/" + \
                 encryptedSummId + "?api_key=" + api_key
             r = requests.get(req)
@@ -64,17 +82,40 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
                 print("Rate Limit Exceeded, gonna sleep a bit")
                 time.sleep(120)
                 r = requests.get(req)
-            rank = r.json()[0]["tier"]
+            
+            if r.status_code == 400 or \
+                    r.status_code == 403 or \
+                    r.status_code == 401 or \
+                    r.status_code == 404 or \
+                    r.status_code == 405 or \
+                    r.status_code == 415 or \
+                    r.status_code == 500 or \
+                    r.status_code == 502 or \
+                    r.status_code == 503 or \
+                    r.status_code == 504:
+                print(f"The following error code has been invoked:{r.status_code}")
+                continue
+             
+            print(r.json())
+            if r.json() != [] and 'tier' in r.json()[0]:
+                rank = r.json()[0]['tier']
+            else: 
+                continue
+
             if not (rank == "CHALLENGER" or rank == "GRANDMASTER" or rank == "MASTER" or rank == "DIAMOND"):
                 continue  # Only consider high ranking players.
-            new_matches = player_to_match_ids(player, api_key, 25, 0) # Note that this may grab ranks below Diamond.
+
+            new_matches = player_to_match_ids(player, api_key, 50, 0) # Note that this may grab ranks below Diamond.
             for match in new_matches:
                 in_already = already.get(match, 0)
                 if in_already == 0:
                     already[match] = 1
                     queue.append(match)
                     ret_matches.append(match)
+                    print(str(counter) + ":" + match)
+                    counter += 1
                     f.write(match+ "\n")
+
         queue.pop(0)
 
     f.close()
