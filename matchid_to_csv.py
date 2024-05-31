@@ -1,46 +1,39 @@
 import requests
 import time
+from handle_riot_api_error import handle_riot_api_error
 
 def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
     startTime = time.time()
+    h_counter = 0
     for match in match_ids:
-
-        #handles exceptions
+        if h_counter == 100:
+            currentTime = time.time()
+            print("Time taken for 100 requests: " + str(currentTime - startTime) + " seconds.")
+            print("Therefore we are going to sleep for "+str(120 - currentTime + startTime)+" seconds.")
+            if currentTime - startTime < 120:
+                time.sleep(120.5 - currentTime + startTime)
+            startTime = time.time()
+            h_counter = 0
+        h_counter += 1
+        # Handle exceptions.
         move_on = False
         while True:
-            match_info = requests.get("https://americas.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s" %(match, api_key))
-            if match_info.status_code == 429:
-                print(f"The following error code has been invoked:{match_info.status_code} sleeping for 2 minutes")
-                time.sleep(120)
-                continue
-            if match_info.status_code == 400 or \
-                    match_info.status_code == 403 or \
-                    match_info.status_code == 401 or \
-                    match_info.status_code == 404 or \
-                    match_info.status_code == 405 or\
-                    match_info.status_code == 415:
-                print(f"The following error code has been invoked:{match_info.status_code}")
+            match_info = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match}?api_key={api_key}")
+
+            if handle_riot_api_error(match_info):
                 move_on = True
                 break
-
-            if match_info.status_code == 500 or \
-                    match_info.status_code == 502 or \
-                    match_info.status_code == 503 or \
-                    match_info.status_code == 504:
-                print(f"The following error code has been invoked:{match_info.status_code} sleeping for 2 minutes")
-                time.sleep(120)
-                continue
 
             match_info = match_info.json()
             break
         if move_on:
             continue
 
-
         temp = [0]
         for participant in match_info["info"]["participants"]:
             temp2 = []
-            champ_tuple = (participant["championName"], participant["championId"])
+            champ_tuple = (participant["championName"],
+                           participant["championId"])
             temp2.append(champ_tuple)
             temp2.append(participant["teamId"])
             temp2.append(participant["teamPosition"])
@@ -50,29 +43,28 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
                 temp[0] -= participant["goldEarned"]
             temp.append(temp2)
 
-        #appends the winning team to the end
-        if match_info["info"]["participants"][0]["win"]:
-            temp.append(100)
+        # Append the winning team to the end.
+        if len(match_info["info"]["participants"]) > 1:
+            if match_info["info"]["participants"][0]["win"]:
+                temp.append(100)
+            else:
+                temp.append(200)
         else:
-            temp.append(200)   
+            temp.append("error")
 
         temp.append(match)
         temp.append(match_info["info"]["gameDuration"])
 
         append_to_csv(temp, file_name)
-        print(time.time() - startTime)
-        time.sleep(0.7)
+        print(h_counter)
 
 
-def append_to_csv(row: list, file_name: str)-> None:
+def append_to_csv(row: list, file_name: str) -> None:
     insert_row = ""
     for i in range(1, len(row)-3):
         insert_row += str(row[i][0][0]) + ","
-    insert_row += str(row[0]) + "," + str(row[-3])+ ","+ str(row[-2]) + "," + str(row[-1])
+    insert_row += str(row[0]) + "," + str(row[-3]) + \
+        "," + str(row[-2]) + "," + str(row[-1])
 
     with open(file_name, 'a') as c:
         c.write(insert_row+"\n")
-
-
-
-
