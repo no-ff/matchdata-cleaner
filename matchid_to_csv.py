@@ -10,7 +10,8 @@ def convert(match_ids: list[str], api_key: str, file_name: str) -> str:
             currentTime = time.time()
             print("Time taken for 100 requests: " + str(currentTime - startTime) + " seconds.")
             print("Therefore we are going to sleep for "+str(120 - currentTime + startTime)+" seconds.")
-            time.sleep(120.1 - currentTime + startTime)
+            if currentTime - startTime < 120:
+                time.sleep(120.5 - currentTime + startTime)
             startTime = time.time()
             h_counter = 0
         h_counter += 1
