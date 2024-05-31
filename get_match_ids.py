@@ -1,6 +1,6 @@
 import requests
 import time
-
+from handle_riot_api_error import handle_riot_api_error
 
 def player_to_match_ids(puuid: str, api_key: str, amount: int, start: int) -> list[str]:
     # Get last x games of the player.
@@ -45,6 +45,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
         # Convert matchid to match datatype
         matchType = matchId_to_match(queue[0], api_key)
         # Grab all 10 players to initially fill up the queue.
+        print(matchType)
         puuids = matchType["metadata"]["participants"]
 
 
@@ -60,7 +61,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
                 print("Rate Limit Exceeded, gonna sleep a bit")
                 time.sleep(120)
                 r = requests.get(req)
-            encryptedSummId = r.json()["id"]
+            
 
             if r.status_code == 400 or \
                     r.status_code == 403 or \
@@ -74,6 +75,9 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
                     r.status_code == 504:
                 print(f"The following error code has been invoked:{r.status_code}")
                 continue
+
+            
+            encryptedSummId = r.json()["id"]
 
             req = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/" + \
                 encryptedSummId + "?api_key=" + api_key
@@ -96,7 +100,7 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
                 print(f"The following error code has been invoked:{r.status_code}")
                 continue
              
-            print(r.json())
+             
             if r.json() != [] and 'tier' in r.json()[0]:
                 rank = r.json()[0]['tier']
             else: 
@@ -120,11 +124,3 @@ def bfs_get_match_ids(amount: int, start: str, already: dict[str, int], api_key:
 
     f.close()
     return ret_matches
-
-
-"""
-if __name__ == "__main__":
-    api_key = ""
-    start = ""
-    print(bfs_get_match_ids(1, start, [start]))
-"""
