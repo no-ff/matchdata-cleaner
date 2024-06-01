@@ -25,7 +25,7 @@ def handle_riot_api_error(riot_object):
             riot_object.status_code == 503 or \
             riot_object.status_code == 504:
         print(f"The following error code has been invoked:{riot_object.status_code} sleeping for 2 minutes")
-        time.sleep(120)
+        time.sleep(10)
         return True
 
     return False
