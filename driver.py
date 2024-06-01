@@ -15,9 +15,9 @@ YOUR_API_KEY = "RGAPI-ebe2abbb-ed67-4e96-bc93-29e11fef4d51"
 
 # Example usage:
 MATCH_IDS = convert_txt_to_list("teddy.txt")
-convert(MATCH_IDS, YOUR_API_KEY, "teddy.csv")
+convert(MATCH_IDS[44832:], YOUR_API_KEY, "teddy.csv")
 
 
 
 
-    
+
