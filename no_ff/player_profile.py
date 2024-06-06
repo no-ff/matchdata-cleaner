@@ -19,7 +19,7 @@ def get_match_data(match_id, key):
     match_data = match_data.json()
     return
 
-def get_player_data(player_json, game_length):
+def get_match_player_data(player_json, game_length):
     """For each player, need sums, items, kda, cs (cs per m), runes, rank, champ, wards damage, player name, """
     player_data = {}
     player_data['username'] = player_json['summonerName']
@@ -61,15 +61,18 @@ def get_runes(runeset):
     for x in runeset['styles'][1]['selections']:
         sec_runes.append(x['perk'])
     new_runes = {primary_keystone: prim_runes, sec_keystone: sec_runes}
-    print(new_runes)
     return new_runes
 
+def convert_match_to_player_data(match_id, match_data, game_length):
+    players=(match_data['info']['participants'])
+    player_data = []
+    for player in players:
+        player_data.append(get_match_player_data(player, game_length))
+    return {match_id: player_data}
 if __name__ == "__main__":
 
     api = 'RGAPI-b159f828-f893-46f0-8c58-faecf53c0525'
     match = 'NA1_5012873300'
     match_data = requests.get(f'https://americas.api.riotgames.com/lol/match/v5/matches/{match}?api_key={api}').json()
-    players=(match_data['info']['participants'])
-    game_length = match_data['info']['gameDuration']
-    for player in players:
-        print(get_player_data(player, game_length))
+    players = convert_match_to_player_data(match, match_data, match_data['info']['gameDuration'])
+    print(players)
